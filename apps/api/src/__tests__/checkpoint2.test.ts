@@ -3,8 +3,10 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import app from '../server';
 import { Device, Tank, Reading, Alert } from '../models';
+import { config } from '../config';
 
 function hashKey(key: string): string {
   return crypto.createHash('sha256').update(key).digest('hex');
@@ -14,6 +16,7 @@ describe('Hardware Integration Checkpoint 2 - P0 + P1 Full System End-to-End', (
   let mongoServer: MongoMemoryServer;
   const devApiKey = 'aq_key_tank-01_local_dev';
   const hashedDevKey = hashKey(devApiKey);
+  const authToken = jwt.sign({ username: 'admin', role: 'admin' }, config.JWT_SECRET);
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -92,7 +95,9 @@ describe('Hardware Integration Checkpoint 2 - P0 + P1 Full System End-to-End', (
     }
 
     // Verify GET /api/v1/tanks/tank-01
-    const tankRes = await request(app).get('/api/v1/tanks/tank-01');
+    const tankRes = await request(app)
+      .get('/api/v1/tanks/tank-01')
+      .set('Authorization', `Bearer ${authToken}`);
     expect(tankRes.status).toBe(200);
 
     const tank = tankRes.body;
@@ -135,12 +140,16 @@ describe('Hardware Integration Checkpoint 2 - P0 + P1 Full System End-to-End', (
     }
 
     // Check tank analytics has flagged leak
-    const tankRes = await request(app).get('/api/v1/tanks/tank-01');
+    const tankRes = await request(app)
+      .get('/api/v1/tanks/tank-01')
+      .set('Authorization', `Bearer ${authToken}`);
     expect(tankRes.status).toBe(200);
     expect(tankRes.body.analytics.leakageFlag).toBe(true);
 
     // Verify alert is recorded in GET /api/v1/alerts
-    const alertsRes = await request(app).get('/api/v1/alerts');
+    const alertsRes = await request(app)
+      .get('/api/v1/alerts')
+      .set('Authorization', `Bearer ${authToken}`);
     expect(alertsRes.status).toBe(200);
     expect(Array.isArray(alertsRes.body)).toBe(true);
 
@@ -150,12 +159,16 @@ describe('Hardware Integration Checkpoint 2 - P0 + P1 Full System End-to-End', (
     expect(leakAlert.acknowledged).toBe(false);
 
     // Acknowledge the alert
-    const ackRes = await request(app).post(`/api/v1/alerts/${leakAlert._id}/acknowledge`);
+    const ackRes = await request(app)
+      .post(`/api/v1/alerts/${leakAlert._id}/acknowledge`)
+      .set('Authorization', `Bearer ${authToken}`);
     expect(ackRes.status).toBe(200);
     expect(ackRes.body.alert.acknowledged).toBe(true);
 
     // Re-verify alert state after acknowledge
-    const updatedAlerts = await request(app).get('/api/v1/alerts');
+    const updatedAlerts = await request(app)
+      .get('/api/v1/alerts')
+      .set('Authorization', `Bearer ${authToken}`);
     const updatedLeakAlert = updatedAlerts.body.find(
       (a: { _id: string }) => a._id === leakAlert._id
     );
@@ -177,11 +190,15 @@ describe('Hardware Integration Checkpoint 2 - P0 + P1 Full System End-to-End', (
 
     expect(res.status).toBe(201);
 
-    const tankRes = await request(app).get('/api/v1/tanks/tank-01');
+    const tankRes = await request(app)
+      .get('/api/v1/tanks/tank-01')
+      .set('Authorization', `Bearer ${authToken}`);
     expect(tankRes.status).toBe(200);
     expect(tankRes.body.status).toBe('critical');
 
-    const alertsRes = await request(app).get('/api/v1/alerts');
+    const alertsRes = await request(app)
+      .get('/api/v1/alerts')
+      .set('Authorization', `Bearer ${authToken}`);
     expect(alertsRes.status).toBe(200);
     const criticalAlert = alertsRes.body.find((a: { type: string }) => a.type === 'CRITICAL_WATER');
     expect(criticalAlert).toBeDefined();

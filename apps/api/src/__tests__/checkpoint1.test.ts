@@ -6,6 +6,9 @@ import crypto from 'crypto';
 import app from '../server';
 import { Device, Tank, Reading } from '../models';
 
+import jwt from 'jsonwebtoken';
+import { config } from '../config';
+
 function hashKey(key: string): string {
   return crypto.createHash('sha256').update(key).digest('hex');
 }
@@ -14,6 +17,7 @@ describe('Hardware Integration Checkpoint 1 - Local ESP32 Protocol Verification'
   let mongoServer: MongoMemoryServer;
   const devApiKey = 'aq_key_tank-01_local_dev';
   const hashedDevKey = hashKey(devApiKey);
+  const authToken = jwt.sign({ username: 'admin', role: 'admin' }, config.JWT_SECRET);
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -97,7 +101,9 @@ describe('Hardware Integration Checkpoint 1 - Local ESP32 Protocol Verification'
     expect(storedReadings[2].waterLevel).toBe(74.0);
 
     // Verify GET /api/v1/tanks/tank-01 reflects the latest state from the 3rd reading
-    const tankRes = await request(app).get('/api/v1/tanks/tank-01');
+    const tankRes = await request(app)
+      .get('/api/v1/tanks/tank-01')
+      .set('Authorization', `Bearer ${authToken}`);
     expect(tankRes.status).toBe(200);
     expect(tankRes.body.currentWaterLevel).toBe(74.0);
     expect(tankRes.body.currentFlowRate).toBe(2.2);
@@ -105,7 +111,9 @@ describe('Hardware Integration Checkpoint 1 - Local ESP32 Protocol Verification'
     expect(tankRes.body.status).toBe('normal');
 
     // Verify GET /api/v1/tanks/tank-01/readings returns historical readings
-    const historyRes = await request(app).get('/api/v1/tanks/tank-01/readings');
+    const historyRes = await request(app)
+      .get('/api/v1/tanks/tank-01/readings')
+      .set('Authorization', `Bearer ${authToken}`);
     expect(historyRes.status).toBe(200);
     expect(historyRes.body.readings.length).toBe(3);
     expect(historyRes.body.count).toBe(3);

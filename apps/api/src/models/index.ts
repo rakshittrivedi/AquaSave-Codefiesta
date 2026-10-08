@@ -3,3 +3,4 @@ export * from './Tank';
 export * from './Device';
 export * from './DailySummary';
 export * from './Alert';
+export * from './User';

@@ -11,6 +11,8 @@ import tanksRouter from './routes/tanks';
 import readingsRouter from './routes/readings';
 import analyticsRouter from './routes/analytics';
 import alertsRouter from './routes/alerts';
+import authRouter, { ensureAdminUser } from './routes/auth';
+import { authMiddleware } from './middleware/auth';
 import { startStaleDetector } from './services/staleDetector';
 import { startForecastPoller } from './services/weatherService';
 import { initSocketServer } from './socket';
@@ -58,11 +60,12 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
   res.status(200).json({ status: 'ok' });
 });
 
+app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/ingest', ingestRouter);
-app.use('/api/v1/tanks', tanksRouter);
-app.use('/api/v1/tanks', readingsRouter);
-app.use('/api/v1/tanks', analyticsRouter);
-app.use('/api/v1/alerts', alertsRouter);
+app.use('/api/v1/tanks', authMiddleware, tanksRouter);
+app.use('/api/v1/tanks', authMiddleware, readingsRouter);
+app.use('/api/v1/tanks', authMiddleware, analyticsRouter);
+app.use('/api/v1/alerts', authMiddleware, alertsRouter);
 
 const httpServer = http.createServer(app);
 const io = initSocketServer(httpServer);
@@ -72,7 +75,8 @@ let staleTimer: NodeJS.Timeout | null = null;
 let forecastTimer: NodeJS.Timeout | null = null;
 
 if (config.NODE_ENV !== 'test') {
-  connectDB().then(() => {
+  connectDB().then(async () => {
+    await ensureAdminUser();
     httpServer.listen(config.PORT, () => {
       logger.info(`Server running on port ${config.PORT} with Socket.IO enabled`);
     });
