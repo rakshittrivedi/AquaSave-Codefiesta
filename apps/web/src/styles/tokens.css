@@ -1,0 +1,45 @@
+:root {
+  /* Surface & Base Colors */
+  --bg-primary: #0d1117;
+  --surface-card: #161b22;
+  --surface-card-elevated: #21262d;
+  --border-default: #30363d;
+  --border-focus: #58a6ff;
+
+  /* Typography Colors */
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+
+  /* Brand / Water Colors */
+  --color-water-primary: #0284c7;
+  --color-water-accent: #38bdf8;
+  --color-water-deep: #0369a1;
+
+  /* Status Colors */
+  --color-status-normal: #10b981;
+  --color-status-low: #f59e0b;
+  --color-status-critical: #ef4444;
+  --color-status-offline: #64748b;
+
+  /* Chart Series */
+  --color-chart-1: #0284c7;
+  --color-chart-2: #10b981;
+  --color-chart-3: #f59e0b;
+  --color-chart-4: #8b5cf6;
+
+  /* Tank Fill Color (dynamically mapped per status in components) */
+  --tank-fill-color: var(--color-status-normal);
+  --tank-fill-glow: rgba(16, 185, 129, 0.2);
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
