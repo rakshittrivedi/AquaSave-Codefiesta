@@ -458,7 +458,7 @@
 
 ---
 
-- [ ] **T-026 Demo Dry Run 1 and Bug Fix Pass**
+- [x] **T-026 Demo Dry Run 1 and Bug Fix Pass**
 
   - Priority: P0 (Release Gate)
   - Estimated Time: 75 min
