@@ -3,14 +3,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import pino from 'pino';
 import pinoHttp from 'pino-http';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { config } from './config';
+import { connectDB, disconnectDB } from './db';
 
 export const logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
+  level: config.LOG_LEVEL || 'info',
   transport:
-    process.env.NODE_ENV !== 'production'
+    config.NODE_ENV !== 'production'
       ? {
           target: 'pino-pretty',
           options: {
@@ -21,12 +20,11 @@ export const logger = pino({
 });
 
 const app = express();
-const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: config.CORS_ORIGIN || '*',
     credentials: true,
   })
 );
@@ -43,10 +41,31 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
   res.status(200).json({ status: 'ok' });
 });
 
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(port, () => {
-    logger.info(`Server running on port ${port}`);
+let serverInstance: ReturnType<typeof app.listen> | null = null;
+
+if (config.NODE_ENV !== 'test') {
+  connectDB().then(() => {
+    serverInstance = app.listen(config.PORT, () => {
+      logger.info(`Server running on port ${config.PORT}`);
+    });
   });
+
+  const handleShutdown = async (signal: string) => {
+    logger.info(`Received ${signal}, initiating graceful shutdown...`);
+    if (serverInstance) {
+      serverInstance.close(async () => {
+        logger.info('HTTP server closed');
+        await disconnectDB();
+        process.exit(0);
+      });
+    } else {
+      await disconnectDB();
+      process.exit(0);
+    }
+  };
+
+  process.on('SIGINT', () => handleShutdown('SIGINT'));
+  process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 }
 
 export default app;
