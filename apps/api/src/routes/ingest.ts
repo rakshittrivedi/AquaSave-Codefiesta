@@ -3,6 +3,7 @@ import { Server } from 'socket.io';
 import { deviceAuth } from '../middleware/deviceAuth';
 import { ingestSchema } from '../schemas/ingestSchema';
 import { Reading, Device, Tank, Alert, TankStatus } from '../models';
+import { computeRollingRate, computeDepletionHours } from '../services/analyticsService';
 
 const router = Router();
 
@@ -87,6 +88,31 @@ router.post('/', deviceAuth, async (req: Request, res: Response): Promise<void> 
     tank.isOnline = true;
     tank.lastSeenAt = new Date();
 
+    // 7.1 Compute Analytics (Rolling rate & Depletion hours over last 12 readings)
+    const recentReadings = await Reading.find({ deviceId })
+      .sort({ timestamp: -1 })
+      .limit(12)
+      .lean();
+
+    const rollingRateLph = computeRollingRate(recentReadings);
+    const currentVolumeLiters = (tank.capacityLiters * waterLevel) / 100;
+    const hoursToEmpty = computeDepletionHours(currentVolumeLiters, rollingRateLph);
+
+    if (!tank.analytics) {
+      tank.analytics = {
+        rollingRateLph: 0,
+        hoursToEmpty: null,
+        leakageFlag: false,
+        leakageFlagReason: null,
+        totalHarvestedLiters: 0,
+        estimatedSavingsUsd: 0,
+        co2SavedKg: 0,
+      };
+    }
+
+    tank.analytics.rollingRateLph = rollingRateLph;
+    tank.analytics.hoursToEmpty = hoursToEmpty;
+
     let newStatus: TankStatus = 'normal';
     if (waterLevel <= tank.thresholds.criticalPercent) {
       newStatus = 'critical';
@@ -136,6 +162,7 @@ router.post('/', deviceAuth, async (req: Request, res: Response): Promise<void> 
       timestamp: readingDate.toISOString(),
       status: tank ? tank.status : 'normal',
       isOnline: true,
+      analytics: tank ? tank.analytics : undefined,
     };
     io.to('tank:all').emit('reading:new', eventPayload);
     io.to(`tank:${deviceId}`).emit('reading:new', eventPayload);
