@@ -9,6 +9,7 @@ import { connectDB, disconnectDB } from './db';
 import ingestRouter from './routes/ingest';
 import tanksRouter from './routes/tanks';
 import readingsRouter from './routes/readings';
+import analyticsRouter from './routes/analytics';
 import { startStaleDetector } from './services/staleDetector';
 import { initSocketServer } from './socket';
 
@@ -50,6 +51,7 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
 app.use('/api/v1/ingest', ingestRouter);
 app.use('/api/v1/tanks', tanksRouter);
 app.use('/api/v1/tanks', readingsRouter);
+app.use('/api/v1/tanks', analyticsRouter);
 
 const httpServer = http.createServer(app);
 const io = initSocketServer(httpServer);
