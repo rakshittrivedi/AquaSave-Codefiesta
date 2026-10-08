@@ -473,7 +473,7 @@
 
 ---
 
-- [ ] **T-027 Final Demo Dry Run and Validation**
+- [x] **T-027 Final Demo Dry Run and Validation**
 
   - Priority: P0 (Release Gate)
   - Estimated Time: 30 min
