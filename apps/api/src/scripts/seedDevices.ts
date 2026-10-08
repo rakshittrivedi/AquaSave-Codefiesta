@@ -83,7 +83,9 @@ export async function seedDevicesAndTanks(): Promise<{
     const existingDevice = await Device.findOne({ deviceId: t.tankId });
     if (!existingDevice) {
       // Deterministic dev-friendly API key for testing and simulator
-      const rawKey = `aq_key_${t.tankId}_${crypto.randomBytes(8).toString('hex')}`;
+      const defaultKey = `aq_key_${t.tankId}_local_dev`;
+      const envKeyName = `DEVICE_KEY_${t.tankId.toUpperCase().replace('-', '_')}`;
+      const rawKey = process.env[envKeyName] || defaultKey;
       const hashed = hashKey(rawKey);
 
       await Device.create({

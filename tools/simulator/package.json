@@ -2,9 +2,16 @@
   "name": "@aquasave/simulator",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "start": "ts-node src/simulator.ts",
     "dev": "ts-node src/simulator.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
   }
 }
