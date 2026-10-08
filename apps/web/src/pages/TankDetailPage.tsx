@@ -10,6 +10,7 @@ import ConsumptionChart from '../components/charts/ConsumptionChart';
 import PredictionPanel from '../components/analytics/PredictionPanel';
 import LeakagePanel from '../components/analytics/LeakagePanel';
 import SavingsPanel from '../components/analytics/SavingsPanel';
+import RainForecast from '../components/forecast/RainForecast';
 
 interface TankDetailPageProps {
   tankId: string;
@@ -160,6 +161,9 @@ export const TankDetailPage: React.FC<TankDetailPageProps> = ({ tankId, onBack }
         />
         <SavingsPanel tank={tank} />
       </div>
+
+      {/* 24-Hour Precipitation Forecast Strip */}
+      <RainForecast forecast={tank.forecast} />
 
       {/* Historical Telemetry Charts (Level & Flow) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -367,7 +367,7 @@
 
 ---
 
-- [ ] **T-020 Rain Forecast Poller, Cache, and RainForecast Component**
+- [x] **T-020 Rain Forecast Poller, Cache, and RainForecast Component**
 
   - Priority: P1
   - Estimated Time: 65 min

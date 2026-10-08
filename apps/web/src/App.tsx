@@ -9,6 +9,7 @@ import TankGrid from './components/tanks/TankGrid';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import TankDetailPage from './pages/TankDetailPage';
 import SavingsPanel from './components/analytics/SavingsPanel';
+import RainForecast from './components/forecast/RainForecast';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +46,7 @@ const DashboardContent: React.FC<{
             </div>
             {/* Dashboard Analytics Impact Row */}
             <SavingsPanel tanks={tanks} />
+            <RainForecast forecast={tanks?.[0]?.forecast} />
             <TankGrid isLoading={isLoading} onSelectTank={(id) => onNavigate(`/tank/${id}`)} />
           </div>
         )}
