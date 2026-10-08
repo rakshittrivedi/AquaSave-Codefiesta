@@ -3,6 +3,7 @@ import {
   computeRollingRate,
   computeDepletionHours,
   detectLeakage,
+  updateSavingsMetrics,
 } from '../services/analyticsService';
 
 describe('Analytics Service: Rolling Rate & Depletion Hours', () => {
@@ -126,6 +127,38 @@ describe('Analytics Service: Rolling Rate & Depletion Hours', () => {
       const result = detectLeakage(readings[7], readings, true); // was currently flagged
       expect(result.isLeak).toBe(false);
       expect(result.reason).toBeNull();
+    });
+  });
+
+  describe('updateSavingsMetrics', () => {
+    it('increments totalHarvestedLiters and calculates savings and CO2 displacement', () => {
+      const initial = {
+        totalHarvestedLiters: 1000,
+        estimatedSavingsUsd: 3.0,
+        co2SavedKg: 0.298,
+      };
+
+      // Add 500 liters
+      const updated = updateSavingsMetrics(initial, 500);
+
+      expect(updated.totalHarvestedLiters).toBe(1500);
+      // 1500 * $0.003 = $4.50
+      expect(updated.estimatedSavingsUsd).toBe(4.5);
+      // 1500 * 0.000298 = 0.447 kg
+      expect(updated.co2SavedKg).toBe(0.447);
+    });
+
+    it('handles zero increment cleanly without altering totals', () => {
+      const initial = {
+        totalHarvestedLiters: 1420,
+        estimatedSavingsUsd: 4.26,
+        co2SavedKg: 0.423,
+      };
+
+      const updated = updateSavingsMetrics(initial, 0);
+      expect(updated.totalHarvestedLiters).toBe(1420);
+      expect(updated.estimatedSavingsUsd).toBe(4.26);
+      expect(updated.co2SavedKg).toBe(0.423);
     });
   });
 });

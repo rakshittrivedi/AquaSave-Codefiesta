@@ -7,6 +7,7 @@ import {
   computeRollingRate,
   computeDepletionHours,
   detectLeakage,
+  updateSavingsMetrics,
 } from '../services/analyticsService';
 
 const router = Router();
@@ -145,6 +146,31 @@ router.post('/', deviceAuth, async (req: Request, res: Response): Promise<void> 
         io.to('tank:all').emit('alert:new', createdLeakAlert);
       }
     }
+
+    // 7.3 Cumulative Water Harvested & CO2 Displacement Metrics
+    let deltaLiters = 0;
+    if (recentReadings.length >= 2) {
+      const tPrev = new Date(recentReadings[1].timestamp).getTime();
+      const tCurr = readingDate.getTime();
+      const dtMinutes = Math.max(0, Math.min(60, (tCurr - tPrev) / (1000 * 60)));
+      const avgFlow = (recentReadings[1].flowRate + flowRate) / 2;
+      deltaLiters = avgFlow * dtMinutes;
+    } else if (flowRate > 0) {
+      deltaLiters = flowRate * (5 / 60);
+    }
+
+    const updatedSavings = updateSavingsMetrics(
+      {
+        totalHarvestedLiters: tank.analytics.totalHarvestedLiters || 0,
+        estimatedSavingsUsd: tank.analytics.estimatedSavingsUsd || 0,
+        co2SavedKg: tank.analytics.co2SavedKg || 0,
+      },
+      deltaLiters
+    );
+
+    tank.analytics.totalHarvestedLiters = updatedSavings.totalHarvestedLiters;
+    tank.analytics.estimatedSavingsUsd = updatedSavings.estimatedSavingsUsd;
+    tank.analytics.co2SavedKg = updatedSavings.co2SavedKg;
 
     let newStatus: TankStatus = 'normal';
     if (waterLevel <= tank.thresholds.criticalPercent) {

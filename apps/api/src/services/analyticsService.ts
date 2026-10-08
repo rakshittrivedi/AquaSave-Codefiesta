@@ -155,3 +155,33 @@ export function detectLeakage(
 
   return { isLeak: false, reason: null };
 }
+
+export const CO2_KG_PER_LITER = 0.000298;
+export const USD_SAVINGS_PER_LITER = 0.003;
+
+export interface SavingsTotals {
+  totalHarvestedLiters: number;
+  estimatedSavingsUsd: number;
+  co2SavedKg: number;
+}
+
+/**
+ * Updates cumulative rainwater utilization, dollar savings, and CO2 emissions displacement.
+ * Uses CO2_KG_PER_LITER = 0.000298 kg/L and USD_SAVINGS_PER_LITER = $0.003/L ($3.00/1000L).
+ */
+export function updateSavingsMetrics(
+  currentTotals: SavingsTotals,
+  deltaLiters: number
+): SavingsTotals {
+  const incremental = Math.max(0, deltaLiters);
+  const newHarvested =
+    Math.round(((currentTotals.totalHarvestedLiters || 0) + incremental) * 100) / 100;
+  const newSavingsUsd = Math.round(newHarvested * USD_SAVINGS_PER_LITER * 100) / 100;
+  const newCo2Kg = Math.round(newHarvested * CO2_KG_PER_LITER * 1000) / 1000;
+
+  return {
+    totalHarvestedLiters: newHarvested,
+    estimatedSavingsUsd: newSavingsUsd,
+    co2SavedKg: newCo2Kg,
+  };
+}
