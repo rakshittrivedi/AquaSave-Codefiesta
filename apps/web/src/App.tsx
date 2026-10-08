@@ -8,6 +8,7 @@ import { useTanksQuery } from './hooks/useTanksQuery';
 import TankGrid from './components/tanks/TankGrid';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import TankDetailPage from './pages/TankDetailPage';
+import SavingsPanel from './components/analytics/SavingsPanel';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,7 +23,7 @@ const DashboardContent: React.FC<{
   currentRoute: string;
   onNavigate: (route: string) => void;
 }> = ({ currentRoute, onNavigate }) => {
-  const { isLoading, isError, error } = useTanksQuery();
+  const { data: tanks, isLoading, isError, error } = useTanksQuery();
 
   const isDetail = currentRoute.startsWith('/tank/');
   const tankId = isDetail ? currentRoute.replace('/tank/', '') : null;
@@ -42,6 +43,8 @@ const DashboardContent: React.FC<{
                 </p>
               </div>
             </div>
+            {/* Dashboard Analytics Impact Row */}
+            <SavingsPanel tanks={tanks} />
             <TankGrid isLoading={isLoading} onSelectTank={(id) => onNavigate(`/tank/${id}`)} />
           </div>
         )}

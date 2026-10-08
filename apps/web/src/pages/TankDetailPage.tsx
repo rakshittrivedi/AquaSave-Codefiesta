@@ -9,6 +9,7 @@ import FlowChart from '../components/charts/FlowChart';
 import ConsumptionChart from '../components/charts/ConsumptionChart';
 import PredictionPanel from '../components/analytics/PredictionPanel';
 import LeakagePanel from '../components/analytics/LeakagePanel';
+import SavingsPanel from '../components/analytics/SavingsPanel';
 
 interface TankDetailPageProps {
   tankId: string;
@@ -157,6 +158,7 @@ export const TankDetailPage: React.FC<TankDetailPageProps> = ({ tankId, onBack }
           leakageFlag={tank.analytics?.leakageFlag}
           leakageFlagReason={tank.analytics?.leakageFlagReason}
         />
+        <SavingsPanel tank={tank} />
       </div>
 
       {/* Historical Telemetry Charts (Level & Flow) */}

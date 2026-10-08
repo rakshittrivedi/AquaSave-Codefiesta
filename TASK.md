@@ -350,7 +350,7 @@
 
 ---
 
-- [ ] **T-019 Water Savings Metrics and SavingsPanel**
+- [x] **T-019 Water Savings Metrics and SavingsPanel**
 
   - Priority: P1
   - Estimated Time: 45 min
