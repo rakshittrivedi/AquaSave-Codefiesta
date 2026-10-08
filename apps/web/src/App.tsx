@@ -7,6 +7,8 @@ import { AlertProvider } from './contexts/AlertContext';
 import { useTanksQuery } from './hooks/useTanksQuery';
 import TankGrid from './components/tanks/TankGrid';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import LevelChart from './components/charts/LevelChart';
+import FlowChart from './components/charts/FlowChart';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -74,6 +76,11 @@ const DashboardContent: React.FC<{
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <LevelChart tankId={currentTank.tankId} />
+              <FlowChart tankId={currentTank.tankId} />
             </div>
           </div>
         ) : (
