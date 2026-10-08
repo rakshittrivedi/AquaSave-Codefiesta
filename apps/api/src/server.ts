@@ -5,6 +5,7 @@ import pino from 'pino';
 import pinoHttp from 'pino-http';
 import { config } from './config';
 import { connectDB, disconnectDB } from './db';
+import ingestRouter from './routes/ingest';
 
 export const logger = pino({
   level: config.LOG_LEVEL || 'info',
@@ -40,6 +41,8 @@ app.use(
 app.get('/api/v1/health', (_req: Request, res: Response) => {
   res.status(200).json({ status: 'ok' });
 });
+
+app.use('/api/v1/ingest', ingestRouter);
 
 let serverInstance: ReturnType<typeof app.listen> | null = null;
 
