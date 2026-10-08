@@ -53,7 +53,7 @@
 
 ---
 
-- [ ] **T-002 Bootstrap Vite + React Frontend and Code-Quality Tooling**
+- [x] **T-002 Bootstrap Vite + React Frontend and Code-Quality Tooling**
 
   - Priority: P0
   - Estimated Time: 50 min
@@ -70,7 +70,7 @@
 
 ---
 
-- [ ] **T-003 MongoDB Atlas Connection, Models, and Device Seed**
+- [x] **T-003 MongoDB Atlas Connection, Models, and Device Seed**
 
   - Priority: P0
   - Estimated Time: 90 min
@@ -94,7 +94,7 @@
 
 ---
 
-- [ ] **T-004 Device Auth Middleware and Ingest Endpoint**
+- [x] **T-004 Device Auth Middleware and Ingest Endpoint**
 
   - Priority: P0
   - Estimated Time: 75 min
@@ -111,7 +111,7 @@
 
 ---
 
-- [ ] **T-005 Dev-Only ESP32 Simulator and Stale Device Detector**
+- [x] **T-005 Dev-Only ESP32 Simulator and Stale Device Detector**
 
   - Priority: P0
   - Estimated Time: 60 min
@@ -132,7 +132,7 @@
 
 ---
 
-- [ ] **T-006 Socket.IO Server, Client Singleton, and TankContext**
+- [x] **T-006 Socket.IO Server, Client Singleton, and TankContext**
 
   - Priority: P0
   - Estimated Time: 65 min
@@ -153,7 +153,7 @@
 
 ---
 
-- [ ] **T-007 TankFill, TankCard, and TankGrid**
+- [x] **T-007 TankFill, TankCard, and TankGrid**
 
   - Priority: P0
   - Estimated Time: 75 min
@@ -171,7 +171,7 @@
 
 ---
 
-- [ ] **T-008 AppShell, StatusBar, and Alert Banner System**
+- [x] **T-008 AppShell, StatusBar, and Alert Banner System**
 
   - Priority: P0
   - Estimated Time: 55 min
@@ -188,7 +188,7 @@
 
 ---
 
-- [ ] **T-009 Tanks REST Endpoints and Dashboard Data Fetch**
+- [x] **T-009 Tanks REST Endpoints and Dashboard Data Fetch**
 
   - Priority: P0
   - Estimated Time: 45 min
@@ -209,7 +209,7 @@
 
 ---
 
-- [ ] **T-010 Readings Endpoint with Level and Flow Charts**
+- [x] **T-010 Readings Endpoint with Level and Flow Charts**
 
   - Priority: P0
   - Estimated Time: 65 min
@@ -226,7 +226,7 @@
 
 ---
 
-- [ ] **T-011 Daily Aggregation Endpoint and ConsumptionChart**
+- [x] **T-011 Daily Aggregation Endpoint and ConsumptionChart**
 
   - Priority: P0
   - Estimated Time: 60 min
@@ -243,7 +243,7 @@
 
 ---
 
-- [ ] **T-012 Tank Detail Page**
+- [x] **T-012 Tank Detail Page**
 
   - Priority: P0
   - Estimated Time: 35 min
@@ -258,7 +258,7 @@
 
 ---
 
-- [ ] **T-013 Hardware Payload Contract Integration Tests**
+- [x] **T-013 Hardware Payload Contract Integration Tests**
 
   - Priority: P0
   - Estimated Time: 40 min
