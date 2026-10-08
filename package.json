@@ -1,0 +1,23 @@
+{
+  "name": "aquasave",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AquaSave: Smart Rainwater Harvesting Management System",
+  "workspaces": [
+    "apps/web",
+    "apps/api",
+    "tools/simulator"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:simulator": "npm run dev --workspace=tools/simulator",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}
