@@ -98,7 +98,7 @@ export interface LeakageResult {
  * - Rule 2: Continuous uninterrupted flow without any idle resting interval over the sample window.
  */
 export function detectLeakage(
-  latestReading: LeakageReading,
+  _latestReading: LeakageReading,
   recentReadings: LeakageReading[],
   currentlyFlagged: boolean = false
 ): LeakageResult {

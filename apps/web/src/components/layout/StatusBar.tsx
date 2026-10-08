@@ -62,17 +62,23 @@ export const StatusBar: React.FC<StatusBarProps> = ({ activeAlertCount = 0, onOp
         <span className="text-sky-400 font-semibold">{secondsAgo}s ago</span>
       </div>
 
-      {/* Active Alerts Button */}
-      {activeAlertCount > 0 && (
-        <button
-          onClick={onOpenAlerts}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-950/80 border border-rose-800/80 text-rose-300 font-semibold hover:bg-rose-900 transition-colors focus:outline-none focus:ring-1 focus:ring-rose-400"
-          aria-label={`${activeAlertCount} active alerts. Click to view.`}
-        >
+      {/* Alerts Log & History Button */}
+      <button
+        onClick={onOpenAlerts}
+        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-colors focus:outline-none focus:ring-1 ${
+          activeAlertCount > 0
+            ? 'bg-rose-950/80 border-rose-800/80 text-rose-300 font-semibold hover:bg-rose-900 focus:ring-rose-400'
+            : 'bg-[#0D1117] border-[#30363D] text-[#8B949E] hover:text-[#F0F6FC] hover:border-[#58A6FF]/40 focus:ring-sky-400'
+        }`}
+        aria-label={`${activeAlertCount} active alerts. Click to view alert history.`}
+      >
+        {activeAlertCount > 0 ? (
           <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
-          <span>{activeAlertCount} ALERTS</span>
-        </button>
-      )}
+        ) : (
+          <span className="w-2 h-2 rounded-full bg-slate-500" />
+        )}
+        <span>{activeAlertCount > 0 ? `${activeAlertCount} ALERTS` : 'ALERTS (0)'}</span>
+      </button>
     </div>
   );
 };

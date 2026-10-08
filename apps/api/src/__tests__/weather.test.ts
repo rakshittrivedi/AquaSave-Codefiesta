@@ -3,7 +3,6 @@ import {
   fetchOpenMeteoForecast,
   getOrFetchForecast,
   setMemoryCachedForecast,
-  getCachedForecast,
 } from '../services/weatherService';
 
 describe('Weather Service: Open-Meteo Forecast Poller & Resilient Cache', () => {

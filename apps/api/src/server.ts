@@ -10,6 +10,7 @@ import ingestRouter from './routes/ingest';
 import tanksRouter from './routes/tanks';
 import readingsRouter from './routes/readings';
 import analyticsRouter from './routes/analytics';
+import alertsRouter from './routes/alerts';
 import { startStaleDetector } from './services/staleDetector';
 import { startForecastPoller } from './services/weatherService';
 import { initSocketServer } from './socket';
@@ -61,6 +62,7 @@ app.use('/api/v1/ingest', ingestRouter);
 app.use('/api/v1/tanks', tanksRouter);
 app.use('/api/v1/tanks', readingsRouter);
 app.use('/api/v1/tanks', analyticsRouter);
+app.use('/api/v1/alerts', alertsRouter);
 
 const httpServer = http.createServer(app);
 const io = initSocketServer(httpServer);

@@ -388,7 +388,7 @@
 
 ---
 
-- [ ] **T-021 AlertPanel with History and Acknowledge**
+- [x] **T-021 AlertPanel with History and Acknowledge**
 
   - Priority: P1
   - Estimated Time: 35 min

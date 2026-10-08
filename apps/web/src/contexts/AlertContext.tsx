@@ -60,9 +60,17 @@ export const AlertProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       addAlert(alert);
     }
 
+    function handleAcknowledgedAlert(payload: { alertId: string; acknowledged: boolean }) {
+      setAlerts((prev) =>
+        prev.map((a) => (a._id === payload.alertId ? { ...a, acknowledged: true } : a))
+      );
+    }
+
     socket.on('alert:new', handleNewAlert);
+    socket.on('alert:acknowledged', handleAcknowledgedAlert);
     return () => {
       socket.off('alert:new', handleNewAlert);
+      socket.off('alert:acknowledged', handleAcknowledgedAlert);
     };
   }, [socket, addAlert]);
 

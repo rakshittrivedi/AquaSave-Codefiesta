@@ -10,6 +10,7 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 import TankDetailPage from './pages/TankDetailPage';
 import SavingsPanel from './components/analytics/SavingsPanel';
 import RainForecast from './components/forecast/RainForecast';
+import AlertPanel from './components/alerts/AlertPanel';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,14 +24,15 @@ const queryClient = new QueryClient({
 const DashboardContent: React.FC<{
   currentRoute: string;
   onNavigate: (route: string) => void;
-}> = ({ currentRoute, onNavigate }) => {
+  onOpenAlerts: () => void;
+}> = ({ currentRoute, onNavigate, onOpenAlerts }) => {
   const { data: tanks, isLoading, isError, error } = useTanksQuery();
 
   const isDetail = currentRoute.startsWith('/tank/');
   const tankId = isDetail ? currentRoute.replace('/tank/', '') : null;
 
   return (
-    <AppShell activeRoute={currentRoute} onNavigate={onNavigate}>
+    <AppShell activeRoute={currentRoute} onNavigate={onNavigate} onOpenAlerts={onOpenAlerts}>
       <ErrorBoundary fallbackMessage={isError ? error?.message : undefined}>
         {isDetail && tankId ? (
           <TankDetailPage tankId={tankId} onBack={() => onNavigate('/')} />
@@ -57,13 +59,19 @@ const DashboardContent: React.FC<{
 
 export const App: React.FC = () => {
   const [route, setRoute] = useState<string>('/');
+  const [isAlertPanelOpen, setIsAlertPanelOpen] = useState<boolean>(false);
 
   return (
     <QueryClientProvider client={queryClient}>
       <SocketProvider>
         <TankProvider>
           <AlertProvider>
-            <DashboardContent currentRoute={route} onNavigate={setRoute} />
+            <DashboardContent
+              currentRoute={route}
+              onNavigate={setRoute}
+              onOpenAlerts={() => setIsAlertPanelOpen(true)}
+            />
+            <AlertPanel isOpen={isAlertPanelOpen} onClose={() => setIsAlertPanelOpen(false)} />
           </AlertProvider>
         </TankProvider>
       </SocketProvider>

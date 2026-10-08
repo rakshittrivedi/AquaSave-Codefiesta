@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Tank } from '../models/Tank';
 import { logger } from '../server';
 
