@@ -8,6 +8,7 @@ interface AppShellProps {
   activeRoute?: string;
   onNavigate?: (route: string) => void;
   onOpenAlerts?: () => void;
+  onLogout?: () => void;
 }
 
 export const AppShell: React.FC<AppShellProps> = ({
@@ -15,6 +16,7 @@ export const AppShell: React.FC<AppShellProps> = ({
   activeRoute = '/',
   onNavigate,
   onOpenAlerts,
+  onLogout,
 }) => {
   const { activeCount } = useAlerts();
 
@@ -73,9 +75,19 @@ export const AppShell: React.FC<AppShellProps> = ({
             </nav>
           </div>
 
-          {/* Realtime Live StatusBar */}
-          <div className="flex items-center justify-end">
+          {/* Realtime Live StatusBar & Logout */}
+          <div className="flex items-center gap-3 justify-end">
             <StatusBar activeAlertCount={activeCount} onOpenAlerts={onOpenAlerts} />
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="px-2.5 py-1 rounded-md text-xs font-mono text-[#8B949E] hover:text-white bg-[#0D1117] hover:bg-[#21262D] border border-[#30363D] transition-colors focus:outline-none focus:ring-1 focus:ring-sky-500"
+                aria-label="Sign out of SCADA console"
+                title="Sign out of SCADA console"
+              >
+                Sign Out
+              </button>
+            )}
           </div>
         </div>
       </header>

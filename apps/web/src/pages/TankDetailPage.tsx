@@ -12,6 +12,8 @@ import LeakagePanel from '../components/analytics/LeakagePanel';
 import SavingsPanel from '../components/analytics/SavingsPanel';
 import RainForecast from '../components/forecast/RainForecast';
 
+import { authFetch } from '../lib/api';
+
 interface TankDetailPageProps {
   tankId: string;
   onBack: () => void;
@@ -28,7 +30,7 @@ export const TankDetailPage: React.FC<TankDetailPageProps> = ({ tankId, onBack }
   const { data: fetchedTank } = useQuery<Tank>({
     queryKey: ['tank', tankId],
     queryFn: async () => {
-      const res = await fetch(`${apiUrl}/api/v1/tanks/${tankId}`);
+      const res = await authFetch(`${apiUrl}/api/v1/tanks/${tankId}`);
       if (!res.ok) throw new Error('Tank not found');
       return res.json();
     },

@@ -488,7 +488,7 @@
 
 ---
 
-- [ ] **T-028 JWT Authentication: Backend and Login Page**
+- [x] **T-028 JWT Authentication: Backend and Login Page**
 
   - Priority: P2
   - Estimated Time: 80 min

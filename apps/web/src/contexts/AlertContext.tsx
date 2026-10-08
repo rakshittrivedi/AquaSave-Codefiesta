@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { AlertEvent } from '../types/tank';
 import { useSocket } from './SocketProvider';
+import { authFetch } from '../lib/api';
 
 export interface AlertItem extends AlertEvent {
   dismissed?: boolean;
@@ -45,7 +46,7 @@ export const AlertProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const acknowledgeAlert = useCallback(async (alertId: string) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      await fetch(`${apiUrl}/api/v1/alerts/${alertId}/acknowledge`, {
+      await authFetch(`${apiUrl}/api/v1/alerts/${alertId}/acknowledge`, {
         method: 'POST',
       });
     } catch (err) {

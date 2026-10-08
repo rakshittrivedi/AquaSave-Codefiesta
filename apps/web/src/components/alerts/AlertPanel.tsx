@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAlerts } from '../../contexts/AlertContext';
 import { AlertEvent } from '../../types/tank';
+import { authFetch } from '../../lib/api';
 
 export interface AlertPanelProps {
   isOpen: boolean;
@@ -17,7 +18,7 @@ export const AlertPanel: React.FC<AlertPanelProps> = ({ isOpen, onClose }) => {
     try {
       setLoading(true);
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      const res = await fetch(`${apiUrl}/api/v1/alerts?limit=20`);
+      const res = await authFetch(`${apiUrl}/api/v1/alerts?limit=20`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {

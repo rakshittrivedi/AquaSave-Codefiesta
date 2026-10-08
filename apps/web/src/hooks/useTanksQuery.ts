@@ -3,10 +3,12 @@ import { useEffect } from 'react';
 import { Tank } from '../types/tank';
 import { useTanks } from '../contexts/TankContext';
 
+import { authFetch } from '../lib/api';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export async function fetchTanks(): Promise<Tank[]> {
-  const res = await fetch(`${API_URL}/api/v1/tanks`);
+  const res = await authFetch(`${API_URL}/api/v1/tanks`);
   if (!res.ok) {
     throw new Error(`Failed to fetch tanks: HTTP ${res.status}`);
   }

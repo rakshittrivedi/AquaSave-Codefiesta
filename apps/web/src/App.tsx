@@ -12,6 +12,9 @@ import SavingsPanel from './components/analytics/SavingsPanel';
 import RainForecast from './components/forecast/RainForecast';
 import AlertPanel from './components/alerts/AlertPanel';
 
+import LoginPage from './pages/LoginPage';
+import { isAuthenticated, removeToken } from './lib/api';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -25,14 +28,20 @@ const DashboardContent: React.FC<{
   currentRoute: string;
   onNavigate: (route: string) => void;
   onOpenAlerts: () => void;
-}> = ({ currentRoute, onNavigate, onOpenAlerts }) => {
+  onLogout: () => void;
+}> = ({ currentRoute, onNavigate, onOpenAlerts, onLogout }) => {
   const { data: tanks, isLoading, isError, error } = useTanksQuery();
 
   const isDetail = currentRoute.startsWith('/tank/');
   const tankId = isDetail ? currentRoute.replace('/tank/', '') : null;
 
   return (
-    <AppShell activeRoute={currentRoute} onNavigate={onNavigate} onOpenAlerts={onOpenAlerts}>
+    <AppShell
+      activeRoute={currentRoute}
+      onNavigate={onNavigate}
+      onOpenAlerts={onOpenAlerts}
+      onLogout={onLogout}
+    >
       <ErrorBoundary fallbackMessage={isError ? error?.message : undefined}>
         {isDetail && tankId ? (
           <TankDetailPage tankId={tankId} onBack={() => onNavigate('/')} />
@@ -60,6 +69,33 @@ const DashboardContent: React.FC<{
 export const App: React.FC = () => {
   const [route, setRoute] = useState<string>('/');
   const [isAlertPanelOpen, setIsAlertPanelOpen] = useState<boolean>(false);
+  const [authenticated, setAuthenticated] = useState<boolean>(isAuthenticated());
+
+  React.useEffect(() => {
+    const handleUnauthorized = () => {
+      setAuthenticated(false);
+      setRoute('/login');
+    };
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
+  }, []);
+
+  const handleLogout = () => {
+    removeToken();
+    setAuthenticated(false);
+    setRoute('/login');
+  };
+
+  if (!authenticated || route === '/login') {
+    return (
+      <LoginPage
+        onLoginSuccess={() => {
+          setAuthenticated(true);
+          setRoute('/');
+        }}
+      />
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -70,6 +106,7 @@ export const App: React.FC = () => {
               currentRoute={route}
               onNavigate={setRoute}
               onOpenAlerts={() => setIsAlertPanelOpen(true)}
+              onLogout={handleLogout}
             />
             <AlertPanel isOpen={isAlertPanelOpen} onClose={() => setIsAlertPanelOpen(false)} />
           </AlertProvider>
