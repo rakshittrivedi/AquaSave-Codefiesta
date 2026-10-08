@@ -3,7 +3,11 @@ import { Server } from 'socket.io';
 import { deviceAuth } from '../middleware/deviceAuth';
 import { ingestSchema } from '../schemas/ingestSchema';
 import { Reading, Device, Tank, Alert, TankStatus } from '../models';
-import { computeRollingRate, computeDepletionHours } from '../services/analyticsService';
+import {
+  computeRollingRate,
+  computeDepletionHours,
+  detectLeakage,
+} from '../services/analyticsService';
 
 const router = Router();
 
@@ -112,6 +116,35 @@ router.post('/', deviceAuth, async (req: Request, res: Response): Promise<void> 
 
     tank.analytics.rollingRateLph = rollingRateLph;
     tank.analytics.hoursToEmpty = hoursToEmpty;
+
+    // 7.2 Leakage Detection
+    const previousLeakFlag = tank.analytics.leakageFlag || false;
+    const leakageResult = detectLeakage(
+      { flowRate, waterLevel, timestamp: readingDate },
+      recentReadings,
+      previousLeakFlag
+    );
+
+    tank.analytics.leakageFlag = leakageResult.isLeak;
+    tank.analytics.leakageFlagReason = leakageResult.reason;
+
+    // Alert on false -> true transition
+    if (!previousLeakFlag && leakageResult.isLeak) {
+      const createdLeakAlert = await Alert.create({
+        tankId: tank.tankId,
+        deviceId,
+        type: 'LEAKAGE_SUSPECTED',
+        message: leakageResult.reason || `Potential water leak suspected on ${tank.name}`,
+        level: waterLevel,
+        timestamp: new Date(),
+        acknowledged: false,
+      });
+
+      const io: Server | undefined = req.app.get('io');
+      if (io) {
+        io.to('tank:all').emit('alert:new', createdLeakAlert);
+      }
+    }
 
     let newStatus: TankStatus = 'normal';
     if (waterLevel <= tank.thresholds.criticalPercent) {

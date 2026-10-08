@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { computeRollingRate, computeDepletionHours } from '../services/analyticsService';
+import {
+  computeRollingRate,
+  computeDepletionHours,
+  detectLeakage,
+} from '../services/analyticsService';
 
 describe('Analytics Service: Rolling Rate & Depletion Hours', () => {
   describe('computeRollingRate (Trapezoidal Integration)', () => {
@@ -69,6 +73,59 @@ describe('Analytics Service: Rolling Rate & Depletion Hours', () => {
     it('returns null for non-finite rates', () => {
       expect(computeDepletionHours(5000, NaN)).toBeNull();
       expect(computeDepletionHours(5000, Infinity)).toBeNull();
+    });
+  });
+
+  describe('detectLeakage', () => {
+    it('returns false when fewer than 6 readings are available', () => {
+      const readings = [
+        { flowRate: 1.5, waterLevel: 75, timestamp: new Date() },
+        { flowRate: 1.5, waterLevel: 75, timestamp: new Date() },
+      ];
+      const result = detectLeakage(readings[1], readings, false);
+      expect(result.isLeak).toBe(false);
+      expect(result.reason).toBeNull();
+    });
+
+    it('triggers Rule 1 when continuous flow occurs with static water level', () => {
+      // 6 readings with flow = 1.2 L/min but water level static at 75%
+      const baseTime = Date.now();
+      const readings = Array.from({ length: 6 }).map((_, i) => ({
+        flowRate: 1.2,
+        waterLevel: 75.0,
+        timestamp: new Date(baseTime + i * 5000),
+      }));
+
+      const result = detectLeakage(readings[5], readings, false);
+      expect(result.isLeak).toBe(true);
+      expect(result.reason).toMatch(/reservoir water level remains unchanged/i);
+    });
+
+    it('triggers Rule 2 on continuous uninterrupted flow across 8 samples', () => {
+      // 8 readings with continuous draw
+      const baseTime = Date.now();
+      const readings = Array.from({ length: 8 }).map((_, i) => ({
+        flowRate: 0.8,
+        waterLevel: 75.0 - i * 0.1, // small drop
+        timestamp: new Date(baseTime + i * 5000),
+      }));
+
+      const result = detectLeakage(readings[7], readings, false);
+      expect(result.isLeak).toBe(true);
+      expect(result.reason).toBeDefined();
+    });
+
+    it('clears leak flag when normal idle interval occurs', () => {
+      const baseTime = Date.now();
+      const readings = Array.from({ length: 8 }).map((_, i) => ({
+        flowRate: i === 4 ? 0 : 0.8, // has idle period at i=4
+        waterLevel: 75.0 - i * 0.1,
+        timestamp: new Date(baseTime + i * 5000),
+      }));
+
+      const result = detectLeakage(readings[7], readings, true); // was currently flagged
+      expect(result.isLeak).toBe(false);
+      expect(result.reason).toBeNull();
     });
   });
 });

@@ -80,3 +80,78 @@ export function computeDepletionHours(
 
   return Math.round(hours * 10) / 10;
 }
+
+export interface LeakageReading {
+  flowRate: number;
+  waterLevel: number;
+  timestamp: Date | string;
+}
+
+export interface LeakageResult {
+  isLeak: boolean;
+  reason: string | null;
+}
+
+/**
+ * Detects potential plumbing or cistern leaks using rule-based telemetry evaluation:
+ * - Rule 1: Continuous discharge flow while tank water level remains static/negligible delta.
+ * - Rule 2: Continuous uninterrupted flow without any idle resting interval over the sample window.
+ */
+export function detectLeakage(
+  latestReading: LeakageReading,
+  recentReadings: LeakageReading[],
+  currentlyFlagged: boolean = false
+): LeakageResult {
+  if (!recentReadings || recentReadings.length < 6) {
+    return {
+      isLeak: currentlyFlagged,
+      reason: currentlyFlagged ? 'Under sustained observation' : null,
+    };
+  }
+
+  // Sort chronological ascending
+  const sorted = [...recentReadings].sort(
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  );
+
+  const sampleCount = sorted.length;
+  const initialLevel = sorted[0].waterLevel;
+  const latestLevel = sorted[sampleCount - 1].waterLevel;
+  const levelDrop = initialLevel - latestLevel;
+
+  // Check if every reading has active positive flow
+  const allFlowing = sorted.every((r) => (r.flowRate || 0) >= 0.4);
+  const avgFlow = sorted.reduce((sum, r) => sum + Math.max(0, r.flowRate || 0), 0) / sampleCount;
+
+  // Check for idle periods: any reading with zero or near-zero flow indicates normal usage
+  const hasIdlePeriod = sorted.some((r) => (r.flowRate || 0) < 0.2);
+
+  // If currently flagged, normal operation with resting periods clears the flag
+  if (currentlyFlagged) {
+    if (hasIdlePeriod || avgFlow < 0.3) {
+      return { isLeak: false, reason: null };
+    }
+    return {
+      isLeak: true,
+      reason: 'Continuous uninterrupted flow without normal resting interval',
+    };
+  }
+
+  // Rule 1: Continuous positive flow while water level delta is static or negligible
+  if (allFlowing && avgFlow >= 0.8 && Math.abs(levelDrop) < 0.3) {
+    return {
+      isLeak: true,
+      reason: 'Active discharge flow detected while reservoir water level remains unchanged',
+    };
+  }
+
+  // Rule 2: Uninterrupted continuous flow across all samples without any idle resting interval
+  if (sampleCount >= 8 && allFlowing && !hasIdlePeriod) {
+    return {
+      isLeak: true,
+      reason: 'Continuous uninterrupted draw detected over consecutive telemetry cycles',
+    };
+  }
+
+  return { isLeak: false, reason: null };
+}
