@@ -2,6 +2,7 @@ import React from 'react';
 import { Tank } from '../../types/tank';
 import TankFill from './TankFill';
 import StatusPill from './StatusPill';
+import PredictionPanel from '../analytics/PredictionPanel';
 
 interface TankCardProps {
   tank: Tank;
@@ -69,6 +70,15 @@ export const TankCard: React.FC<TankCardProps> = ({ tank, onSelect }) => {
               <span className="font-mono text-[#F0F6FC] font-medium">
                 {tank.currentFlowRate.toFixed(1)} L/min
               </span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-[#8B949E]">Depletion:</span>
+              <PredictionPanel
+                hoursToEmpty={tank.analytics?.hoursToEmpty}
+                rollingRateLph={tank.analytics?.rollingRateLph}
+                flowRate={tank.currentFlowRate}
+                compact={true}
+              />
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-[#8B949E]">Capacity:</span>

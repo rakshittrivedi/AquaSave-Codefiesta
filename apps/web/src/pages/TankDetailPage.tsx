@@ -7,6 +7,7 @@ import TankFill from '../components/tanks/TankFill';
 import LevelChart from '../components/charts/LevelChart';
 import FlowChart from '../components/charts/FlowChart';
 import ConsumptionChart from '../components/charts/ConsumptionChart';
+import PredictionPanel from '../components/analytics/PredictionPanel';
 
 interface TankDetailPageProps {
   tankId: string;
@@ -142,6 +143,15 @@ export const TankDetailPage: React.FC<TankDetailPageProps> = ({ tankId, onBack }
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Real-time Analytics & Intelligence Strip */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <PredictionPanel
+          hoursToEmpty={tank.analytics?.hoursToEmpty}
+          rollingRateLph={tank.analytics?.rollingRateLph}
+          flowRate={tank.currentFlowRate}
+        />
       </div>
 
       {/* Historical Telemetry Charts (Level & Flow) */}

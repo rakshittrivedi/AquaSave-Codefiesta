@@ -45,6 +45,7 @@ export interface ReadingEvent {
   timestamp: string;
   status: TankStatus;
   isOnline: boolean;
+  analytics?: TankAnalytics;
 }
 
 export interface OfflineEvent {

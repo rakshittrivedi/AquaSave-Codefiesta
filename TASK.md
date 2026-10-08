@@ -316,7 +316,7 @@
 
 ---
 
-- [ ] **T-017 Rolling Rate, Depletion Prediction, and PredictionPanel**
+- [x] **T-017 Rolling Rate, Depletion Prediction, and PredictionPanel**
 
   - Priority: P1
   - Estimated Time: 65 min

@@ -149,6 +149,7 @@ function tankReducer(state: TankState, action: TankAction): TankState {
         status: event.status,
         isOnline: event.isOnline,
         lastSeenAt: event.timestamp,
+        analytics: event.analytics ?? target.analytics,
       };
 
       return {
