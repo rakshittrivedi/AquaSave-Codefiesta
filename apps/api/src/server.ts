@@ -11,6 +11,7 @@ import tanksRouter from './routes/tanks';
 import readingsRouter from './routes/readings';
 import analyticsRouter from './routes/analytics';
 import { startStaleDetector } from './services/staleDetector';
+import { startForecastPoller } from './services/weatherService';
 import { initSocketServer } from './socket';
 
 export const logger = pino({
@@ -66,6 +67,7 @@ const io = initSocketServer(httpServer);
 app.set('io', io);
 
 let staleTimer: NodeJS.Timeout | null = null;
+let forecastTimer: NodeJS.Timeout | null = null;
 
 if (config.NODE_ENV !== 'test') {
   connectDB().then(() => {
@@ -74,12 +76,16 @@ if (config.NODE_ENV !== 'test') {
     });
 
     staleTimer = startStaleDetector(() => app.get('io'), 60000);
+    forecastTimer = startForecastPoller();
   });
 
   const handleShutdown = async (signal: string) => {
     logger.info(`Received ${signal}, initiating graceful shutdown...`);
     if (staleTimer) {
       clearInterval(staleTimer);
+    }
+    if (forecastTimer) {
+      clearInterval(forecastTimer);
     }
     io.close(() => {
       logger.info('Socket.IO connections closed');

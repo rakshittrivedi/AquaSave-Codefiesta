@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { Tank } from '../models';
+import { getCachedForecast } from '../services/weatherService';
 
 const router = Router();
 
@@ -24,7 +25,7 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
         : new Date().toISOString(),
       thresholds: tank.thresholds,
       analytics: tank.analytics,
-      forecast: tank.forecast,
+      forecast: tank.forecast || getCachedForecast(),
       createdAt: tank.createdAt,
       updatedAt: tank.updatedAt,
     }));
@@ -68,7 +69,7 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
         : new Date().toISOString(),
       thresholds: tank.thresholds,
       analytics: tank.analytics,
-      forecast: tank.forecast,
+      forecast: tank.forecast || getCachedForecast(),
       createdAt: tank.createdAt,
       updatedAt: tank.updatedAt,
     });
