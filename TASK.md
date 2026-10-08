@@ -280,7 +280,7 @@
 
 ---
 
-- [ ] **T-015 Deploy Backend (Render) and Frontend (Vercel)**
+- [x] **T-015 Deploy Backend (Render) and Frontend (Vercel)**
 
   - Priority: P0
   - Estimated Time: 50 min
