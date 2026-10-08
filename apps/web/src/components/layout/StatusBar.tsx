@@ -59,7 +59,9 @@ export const StatusBar: React.FC<StatusBarProps> = ({ activeAlertCount = 0, onOp
       {/* Counter: Last Data Received */}
       <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#0D1117] border border-[#30363D] text-[#8B949E]">
         <span>UPDATED:</span>
-        <span className="text-sky-400 font-semibold">{secondsAgo}s ago</span>
+        <span className="text-sky-400 font-semibold">
+          {state.lastDataReceivedAt ? `${secondsAgo}s ago` : 'LIVE'}
+        </span>
       </div>
 
       {/* Alerts Log & History Button */}
