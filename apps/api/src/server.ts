@@ -1,3 +1,4 @@
+import http from 'http';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -7,6 +8,7 @@ import { config } from './config';
 import { connectDB, disconnectDB } from './db';
 import ingestRouter from './routes/ingest';
 import { startStaleDetector } from './services/staleDetector';
+import { initSocketServer } from './socket';
 
 export const logger = pino({
   level: config.LOG_LEVEL || 'info',
@@ -45,13 +47,16 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
 
 app.use('/api/v1/ingest', ingestRouter);
 
-let serverInstance: ReturnType<typeof app.listen> | null = null;
+const httpServer = http.createServer(app);
+const io = initSocketServer(httpServer);
+app.set('io', io);
+
 let staleTimer: NodeJS.Timeout | null = null;
 
 if (config.NODE_ENV !== 'test') {
   connectDB().then(() => {
-    serverInstance = app.listen(config.PORT, () => {
-      logger.info(`Server running on port ${config.PORT}`);
+    httpServer.listen(config.PORT, () => {
+      logger.info(`Server running on port ${config.PORT} with Socket.IO enabled`);
     });
 
     staleTimer = startStaleDetector(() => app.get('io'), 60000);
@@ -62,20 +67,19 @@ if (config.NODE_ENV !== 'test') {
     if (staleTimer) {
       clearInterval(staleTimer);
     }
-    if (serverInstance) {
-      serverInstance.close(async () => {
-        logger.info('HTTP server closed');
-        await disconnectDB();
-        process.exit(0);
-      });
-    } else {
+    io.close(() => {
+      logger.info('Socket.IO connections closed');
+    });
+    httpServer.close(async () => {
+      logger.info('HTTP server closed');
       await disconnectDB();
       process.exit(0);
-    }
+    });
   };
 
   process.on('SIGINT', () => handleShutdown('SIGINT'));
   process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 }
 
+export { httpServer, io };
 export default app;
