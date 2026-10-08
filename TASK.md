@@ -269,7 +269,7 @@
 
 ---
 
-- [ ] **T-014 Hardware Integration Checkpoint 1 (Local)**
+- [x] **T-014 Hardware Integration Checkpoint 1 (Local)**
 
   - Priority: P0
   - Estimated Time: 30 min
