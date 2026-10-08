@@ -4,9 +4,17 @@ import { config } from './config';
 import { logger } from './server';
 
 export function initSocketServer(httpServer: HttpServer): Server {
+  const rawCorsOrigin = config.CORS_ORIGIN || '*';
+  const corsOrigin =
+    rawCorsOrigin === '*'
+      ? '*'
+      : rawCorsOrigin.includes(',')
+        ? rawCorsOrigin.split(',').map((s) => s.trim())
+        : rawCorsOrigin;
+
   const io = new Server(httpServer, {
     cors: {
-      origin: config.CORS_ORIGIN || '*',
+      origin: corsOrigin,
       methods: ['GET', 'POST'],
       credentials: true,
     },

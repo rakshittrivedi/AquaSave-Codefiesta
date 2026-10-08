@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: aquasave-api
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build --workspace=apps/api
+    startCommand: npm run start --workspace=apps/api
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CORS_ORIGIN
+        value: https://aquasave.vercel.app,https://aquasave-codefiesta.vercel.app
+      - key: LOG_LEVEL
+        value: info
+      - key: STALE_THRESHOLD_MINUTES
+        value: 5
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true

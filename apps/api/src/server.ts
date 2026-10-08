@@ -28,10 +28,18 @@ export const logger = pino({
 
 const app = express();
 
+const rawCorsOrigin = config.CORS_ORIGIN || '*';
+const corsOrigin =
+  rawCorsOrigin === '*'
+    ? '*'
+    : rawCorsOrigin.includes(',')
+      ? rawCorsOrigin.split(',').map((s) => s.trim())
+      : rawCorsOrigin;
+
 app.use(helmet());
 app.use(
   cors({
-    origin: config.CORS_ORIGIN || '*',
+    origin: corsOrigin,
     credentials: true,
   })
 );
