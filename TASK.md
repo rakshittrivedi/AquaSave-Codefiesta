@@ -333,7 +333,7 @@
 
 ---
 
-- [ ] **T-018 Leakage Detection Service and LeakagePanel**
+- [x] **T-018 Leakage Detection Service and LeakagePanel**
 
   - Priority: P1
   - Estimated Time: 55 min

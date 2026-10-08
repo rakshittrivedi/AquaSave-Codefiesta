@@ -8,6 +8,7 @@ import LevelChart from '../components/charts/LevelChart';
 import FlowChart from '../components/charts/FlowChart';
 import ConsumptionChart from '../components/charts/ConsumptionChart';
 import PredictionPanel from '../components/analytics/PredictionPanel';
+import LeakagePanel from '../components/analytics/LeakagePanel';
 
 interface TankDetailPageProps {
   tankId: string;
@@ -146,11 +147,15 @@ export const TankDetailPage: React.FC<TankDetailPageProps> = ({ tankId, onBack }
       </div>
 
       {/* Real-time Analytics & Intelligence Strip */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <PredictionPanel
           hoursToEmpty={tank.analytics?.hoursToEmpty}
           rollingRateLph={tank.analytics?.rollingRateLph}
           flowRate={tank.currentFlowRate}
+        />
+        <LeakagePanel
+          leakageFlag={tank.analytics?.leakageFlag}
+          leakageFlagReason={tank.analytics?.leakageFlagReason}
         />
       </div>
 
