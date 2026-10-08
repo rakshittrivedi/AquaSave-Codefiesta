@@ -7,6 +7,7 @@ import pinoHttp from 'pino-http';
 import { config } from './config';
 import { connectDB, disconnectDB } from './db';
 import ingestRouter from './routes/ingest';
+import tanksRouter from './routes/tanks';
 import { startStaleDetector } from './services/staleDetector';
 import { initSocketServer } from './socket';
 
@@ -46,6 +47,7 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
 });
 
 app.use('/api/v1/ingest', ingestRouter);
+app.use('/api/v1/tanks', tanksRouter);
 
 const httpServer = http.createServer(app);
 const io = initSocketServer(httpServer);
