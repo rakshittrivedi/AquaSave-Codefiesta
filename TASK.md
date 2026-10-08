@@ -399,7 +399,7 @@
 
 ---
 
-- [ ] **T-022 Analytics Unit Tests and TankCard Component Test**
+- [x] **T-022 Analytics Unit Tests and TankCard Component Test**
 
   - Priority: P1
   - Estimated Time: 60 min
